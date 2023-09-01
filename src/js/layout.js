@@ -13,6 +13,7 @@ import InfoPageMatias from "./views/infoPageMatias";
 import InfoPageJuan from "./views/infoPageJuan";
 import InfoPageKarol from "./views/infoPageKarol";
 import InfoPageYoselin from "./views/infoPageYoselin";
+import { Login } from "./views/Login";
 
 
 //create your first component
@@ -27,15 +28,16 @@ const Layout = () => {
 				<ScrollToTop>
 					<Navbar />
 					<Routes>
-						<Route path="/" element={<Home />} />
+						<Route path="/*" element={<Login />} />
 						<Route path="/infoPage" element={<InfoPage />} />
+						<Route path="/home" element={<Home />} />
 
+						<Route path="/login" element={<Login />} />
 						<Route path="/infoPageRodrigo/:theid" element={<InfoPageRodrigo />} />
 						<Route path="/infoPageMatias/:theid" element={<InfoPageMatias />} />
 						<Route path="/infoPageJuan/:theid" element={<InfoPageJuan />} />
 						<Route path="/infoPageKarol/:theid" element={<InfoPageKarol />} />
 						<Route path="/infoPageYoselin" element={<InfoPageYoselin />} />
-
 						<Route path="*" element={<h1>Not found!</h1>} />
 					</Routes>
 					<Footer />
