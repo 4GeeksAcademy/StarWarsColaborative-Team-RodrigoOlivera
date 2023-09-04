@@ -1,5 +1,6 @@
 import axios from "axios"
 import { object } from "prop-types"
+import { useNavigate } from "react-router"
 
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
@@ -12,7 +13,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 			planets: [],
 			films: [],
 			starships: [],
-			PageInfo: undefined
+			messageError: undefined,
+			messageExisto: undefined,
+			userinfo: undefined,
+			PageInfo: undefined,
+			auth: false
 		},
 		actions: {
 
@@ -223,24 +228,91 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				setStore({ ...getStore(), favoritos: newArr })
 			},
+			RegistrarUsuario: async (formRegister) => {
+				console.log(formRegister)
+				const store = getStore()
+				try {
+					const { data } = await axios.post("https://vigilant-garbanzo-p99w6qpr6693rvg-3000.app.github.dev/register", formRegister)
+					console.log(data)
+					if (data.ok == true) {
+						setStore({ ...store, messageExisto: data.msg, messageError: undefined })
+						return true
+					} else if (data.ok == false) {
+						setStore({ ...store, messageError: data.msg })
+						return false
+					}
+
+				} catch (error) {
+					return false
+					console.log(error)
+				}
+
+			},
 			Login: async (dataLogin) => {
 				try {
 					const data = await axios.post("https://vigilant-garbanzo-p99w6qpr6693rvg-3000.app.github.dev/login", dataLogin)
 
-					localStorage.setItem("token", data.data.token)
+					if (data.status === 200) {
+						setStore({ ...getStore(), userinfo: data.data.info, auth: true })
+						localStorage.setItem("token", data.data.token)
+					}
 					return true
 				} catch (error) {
 					console.log(error)
+					if (error.response.status === 401) {
+						console.log("error en las credenciales")
+						setStore({ ...getStore(), messageError: error.response.data.msg })
+					}
 					return false
 
 				}
 			},
 			CargarFavoritos: async () => {
 				try {
+					const store = getStore()
+					const token = localStorage.getItem("token")
+					const data = await axios.get(`https://vigilant-garbanzo-p99w6qpr6693rvg-3000.app.github.dev/user/favorite`, {
+						headers: { "Authorization": "Bearer " + token }
+					})
+					if (data.data.dataFinal) {
+						setStore({ ...store, favoritos: data.data.dataFinal })
+					} else {
+						setStore({ ...store, favoritos: data.data.msg })
 
+					}
 				} catch (error) {
-
+					console.log(error)
 				}
+			},
+			CargarInfoUserEspesifico: async () => {
+				try {
+					// Pending
+				} catch (error) {
+					console.log(error)
+				}
+			},
+			Logout: () => {
+				console.log("se cerro sesion existosamente")
+				localStorage.removeItem("token")
+				setStore({ ...getStore(), userinfo: undefined, auth: false })
+			},
+			ValidToken: async () => {
+				try {
+					const token = localStorage.getItem("token")
+					const response = await axios.get(`https://vigilant-garbanzo-p99w6qpr6693rvg-3000.app.github.dev/validToken`, {
+						headers: { "Authorization": "Bearer " + token }
+					})
+					console.log(response)
+					if (response.status == 200) {
+						setStore({ ...getStore(), auth: true })
+					}
+				} catch (error) {
+					if (error.response.status > 400) {
+						console.log(error)
+						getActions().Logout()
+					}
+				}
+
 			}
 
 		}

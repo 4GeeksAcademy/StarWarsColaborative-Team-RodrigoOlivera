@@ -6,7 +6,7 @@ import { FaHeart } from "react-icons/fa";
 const Planetas = () => {
   const { store, actions } = useContext(Context);
   const planetas = store.planets;
-  const {guardarFavoritos} = actions
+  const { guardarFavoritos } = actions
   const navigate = useNavigate();
   const ShowInfo = (uid) => {
     console.log("Showinfo recibe " + uid);
@@ -26,8 +26,8 @@ const Planetas = () => {
   return (
     <div className="row py-5">
       <h1 className="text-danger">Planets</h1>
-      <div style={stylePadre}>
-        {planetas.map((planet) => (
+      <div className="p-3" style={stylePadre}>
+        {planetas.map((planet, index) => (
           <div
             className="card mx-3"
             style={{
@@ -35,7 +35,7 @@ const Planetas = () => {
               minWidth: "300px",
               display: "inline-block",
             }}
-            key={planet.uid}
+            key={index}
           >
             <img
               className="w-100 h-300px"
@@ -65,9 +65,9 @@ const Planetas = () => {
                 >
                   Learn More
                 </a>
-                <button  onClick={()=>guardarFavoritos(planet.name)} className="btn btn-outline-warning ml-auto">
+                {store.auth === true && <button onClick={() => guardarFavoritos(planet.name)} className="btn btn-outline-warning ml-auto">
                   <FaHeart />
-                </button>
+                </button>}
               </div>
             </div>
           </div>
